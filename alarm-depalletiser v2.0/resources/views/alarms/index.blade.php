@@ -4,6 +4,11 @@
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-semibold mb-4">Data Alarm Depalletiser</h1>
 
+    {{-- 🔵 Gambar background di kiri bawah --}}
+    <img src="{{ asset('images/senyuminajah.jpg') }}"
+         alt="Background"
+         class="absolute bottom-0 left-0 w-32 opacity-10 pointer-events-none select-none hidden sm:block">
+
     @if(session('success'))
         <div class="bg-green-100 text-green-800 rounded p-3 mb-3">
             {{ session('success') }}

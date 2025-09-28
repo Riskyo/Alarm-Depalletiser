@@ -1,96 +1,128 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
+<nav class="bg-white border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
+            <!-- Logo + Title -->
+            <div class="flex items-center">
                 <div class="shrink-0 flex items-center">
-                    
+                    <a href="{{ route('alarms.index') }}" class="text-lg font-bold text-gray-700">
+                        ALARM DEPALLETISER
+                    </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')">
-    {{ __('Alarms') }}
-</x-nav-link>
-
+                <!-- Desktop Navigation -->
+                <div class="hidden sm:flex sm:space-x-8 sm:ms-10">
+                    <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')">
+                        {{ __('Alarms') }}
+                    </x-nav-link>
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                        <div>{{ Auth::check() ? Auth::user()->name : 'Guest' }}</div>
+            <!-- Desktop Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6 relative">
+                <button id="desktop-dropdown-btn"
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none">
+                    <div>{{ Auth::check() ? Auth::user()->name : 'Guest' }}</div>
+                    <svg class="ms-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" d="M6 8l4 4 4-4" />
+                    </svg>
+                </button>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
+                <div id="desktop-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                            {{ __('Log Out') }}
                         </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                       
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                    </form>
+                </div>
             </div>
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+            <!-- Mobile Hamburger -->
+            <div class="flex items-center sm:hidden">
+                <button id="hamburger-btn"
+                    class="p-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none">
+                    <!-- Icon -->
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path id="hamburger-icon" class="inline-flex"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                        <path id="close-icon" class="hidden"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-        <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')">
-    {{ __('Alarms') }}
-</x-nav-link>
-
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden sm:hidden bg-white border-t border-gray-200">
+        <div class="pt-2 pb-3">
+            <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')"
+                class="block px-4 py-2">
+                {{ __('Alarms') }}
+            </x-nav-link>
         </div>
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::check() ? Auth::user()->email : 'Guest' }}</div>
+        <div class="border-t border-gray-200 bg-gray-50">
+            <div class="px-4 py-3">
+                <button id="mobile-dropdown-btn" class="font-medium text-base text-gray-800 w-full text-left">
+                    {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+                </button>
             </div>
 
-            <div class="mt-3 space-y-1">
-         
-
-                <!-- Authentication -->
+            <div id="mobile-dropdown-menu" class="hidden border-t border-gray-200">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                    <button type="submit"
+                        class="block w-full text-left px-4 py-2 text-red-600 font-semibold hover:bg-red-50 focus:bg-red-50">
                         {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </nav>
+
+<!-- JS untuk toggle menu -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
+
+    const mobileDropdownBtn = document.getElementById('mobile-dropdown-btn');
+    const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+
+    const desktopDropdownBtn = document.getElementById('desktop-dropdown-btn');
+    const desktopDropdownMenu = document.getElementById('desktop-dropdown-menu');
+
+    // Toggle mobile menu
+    hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        hamburgerIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    });
+
+    // Toggle mobile logout menu
+    mobileDropdownBtn.addEventListener('click', () => {
+        mobileDropdownMenu.classList.toggle('hidden');
+    });
+
+    // Toggle desktop dropdown
+    desktopDropdownBtn.addEventListener('click', () => {
+        desktopDropdownMenu.classList.toggle('hidden');
+    });
+
+    // Klik di luar menu untuk menutup dropdown desktop
+    document.addEventListener('click', function(e) {
+        if (!desktopDropdownBtn.contains(e.target) && !desktopDropdownMenu.contains(e.target)) {
+            desktopDropdownMenu.classList.add('hidden');
+        }
+    });
+});
+</script>

@@ -1,8 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
+@auth
+    @can('isAdmin')
+        <div class="bg-gray-800 text-white p-3 rounded mb-4 text-center">
+            👥 Total Pengunjung: <span class="font-bold">{{ $visitorCount }}</span>
+        </div>
+    @endcan
+@endauth
+
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-semibold mb-4">Data Alarm Depalletiser</h1>
+
+    <div class="p-3 bg-gray-100 rounded">
+        <h4 class="font-semibold mb-2 flex items-center">
+            🔍 Most Searched:
+            <span class="ml-2 flex flex-wrap gap-2">
+                @forelse ($mostSearched as $s)
+                    <a href="{{ url()->current() }}?search={{ urlencode($s->query) }}"
+                       class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded transition">
+                        {{ $s->query }} <span class="text-gray-500">({{ $s->total }})</span>
+                    </a>
+                @empty
+                    <span class="text-gray-500 text-sm">Belum ada data pencarian</span>
+                @endforelse
+            </span>
+        </h4>
+    </div>
+</div>
+
 
     @if(session('success'))
         <div class="bg-green-100 text-green-800 rounded p-3 mb-3">
@@ -153,3 +179,125 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+<script>
+window.addEventListener('load', function() {
+    if (typeof Shepherd === 'undefined') {
+        console.error('Shepherd belum siap!');
+        return;
+    }
+
+    const TOUR_KEY = 'app_seen_tour_v4';
+    const forceShow = false;
+    if (!forceShow && localStorage.getItem(TOUR_KEY)) return;
+
+    const tour = new Shepherd.Tour({
+        defaultStepOptions: {
+            cancelIcon: { enabled: true },
+            classes: 'shadow-md bg-purple-600 text-white rounded-md',
+            scrollTo: { behavior: 'smooth', block: 'center' }
+        },
+        useModalOverlay: true
+    });
+
+    const addStepIf = (selectorOrEl, opts) => {
+        let el = null;
+
+        // Jika input berupa string selector
+        if (typeof selectorOrEl === 'string') {
+            el = document.querySelector(selectorOrEl);
+        } else {
+            // Jika langsung elemen
+            el = selectorOrEl;
+        }
+
+        if (el) {
+            opts.attachTo.element = el;
+            tour.addStep(opts);
+        }
+    };
+
+    // ============ UNTUK SEMUA USER ============
+    addStepIf('h1', {
+        title: 'Selamat Datang 👋',
+        text: 'Ini adalah halaman utama Alarm Depalletiser.',
+        attachTo: { on: 'bottom' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    addStepIf('input[name=search]', {
+        title: 'Bagian Pencarian 🔍',
+        text: 'Gunakan kolom ini untuk mencari alarm berdasarkan deskripsi atau keyword.',
+        attachTo: { on: 'bottom' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    addStepIf('button.bg-blue-600', {
+        title: 'Tombol Search',
+        text: 'Klik tombol ini untuk menjalankan pencarian.',
+        attachTo: { on: 'bottom' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    // === PERBAIKAN: cari kolom PLC I/O secara manual ===
+    const thElements = document.querySelectorAll('th');
+    let plcTh = null;
+    thElements.forEach(th => {
+        if (th.textContent.trim().includes('PLC I/O')) {
+            plcTh = th;
+        }
+    });
+
+    addStepIf(plcTh, {
+        title: 'Kolom PLC I/O ⚙️',
+        text: 'Klik gambar di kolom ini untuk melihat detail PLC I/O dalam ukuran penuh.',
+        attachTo: { on: 'top' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    // ============ KHUSUS ADMIN ============
+    @can('isAdmin')
+    addStepIf('a.bg-emerald-600', {
+        title: 'Tambah Data ➕',
+        text: 'Klik tombol ini untuk menambah data alarm baru.',
+        attachTo: { on: 'left' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    addStepIf('a.text-blue-700', {
+        title: 'Edit Data ✏️',
+        text: 'Gunakan tombol Edit untuk mengubah informasi alarm yang sudah ada.',
+        attachTo: { on: 'top' },
+        buttons: [{ text: 'Lanjut', action: tour.next }]
+    });
+
+    addStepIf('button.text-red-700', {
+        title: 'Hapus Data ❌',
+        text: 'Klik tombol Hapus untuk menghapus data alarm. Hati-hati, data akan terhapus permanen.',
+        attachTo: { on: 'top' },
+        buttons: [{ text: 'Selesai', action: tour.complete }]
+    });
+    @else
+    addStepIf('table.min-w-full', {
+        title: 'Hasil Alarm 📋',
+        text: 'Di sini kamu bisa melihat hasil pencarian dan detail setiap alarm.',
+        attachTo: { on: 'top' },
+        buttons: [{ text: 'Selesai', action: tour.complete }]
+    });
+    @endcan
+
+    // jalankan tour
+    if (tour.steps.length) {
+        setTimeout(() => {
+            tour.start();
+            localStorage.setItem(TOUR_KEY, '1');
+        }, 500);
+    }
+
+    tour.on('complete', () => localStorage.setItem(TOUR_KEY, '1'));
+    tour.on('cancel', () => localStorage.setItem(TOUR_KEY, '1'));
+});
+</script>
+@endsection
+

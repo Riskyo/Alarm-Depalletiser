@@ -9,12 +9,31 @@
                     </a>
                 </div>
 
-                <!-- Desktop Navigation -->
+               <!-- Desktop Navigation -->
                 <div class="hidden sm:flex sm:space-x-8 sm:ms-10">
-                    <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')">
-                        {{ __('Alarms') }}
-                    </x-nav-link>
+                    <button 
+                        id="showTutorialBtn"
+                        class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 
+                            text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none transition duration-150 ease-in-out">
+                        Show Tutorial
+                    </button>
                 </div>
+
+<!-- Tambahkan script untuk memanggil tutorial -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('showTutorialBtn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            // Hapus flag localStorage supaya Shepherd muncul lagi
+            localStorage.removeItem('app_seen_tour_v4');
+            // Refresh halaman agar tour otomatis dimulai
+            location.reload();
+        });
+    }
+});
+</script>
+
             </div>
 
             <!-- Desktop Dropdown -->
@@ -61,7 +80,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden sm:hidden bg-white border-t border-gray-200">
         <div class="pt-2 pb-3">
-            <x-nav-link :href="route('alarms.index')" :active="request()->routeIs('alarms.index')"
+            <x-nav-link href="showTutorialBtn" id="showTutorialBtn"
                 class="block px-4 py-2">
                 {{ __('Alarms') }}
             </x-nav-link>

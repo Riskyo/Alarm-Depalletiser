@@ -12,21 +12,7 @@
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-semibold mb-4">Data Alarm Depalletiser</h1>
 
-    <div class="p-3 bg-gray-100 rounded">
-        <h4 class="font-semibold mb-2 flex items-center">
-            🔍 Most Searched:
-            <span class="ml-2 flex flex-wrap gap-2">
-                @forelse ($mostSearched as $s)
-                    <a href="{{ url()->current() }}?search={{ urlencode($s->query) }}"
-                       class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded transition">
-                        {{ $s->query }} <span class="text-gray-500">({{ $s->total }})</span>
-                    </a>
-                @empty
-                    <span class="text-gray-500 text-sm">Belum ada data pencarian</span>
-                @endforelse
-            </span>
-        </h4>
-    </div>
+    
 </div>
 
 
@@ -50,6 +36,22 @@
             @endcan
         @endauth
     </form>
+
+    <div class="p-3 100 rounded">
+        <h4 class="font-semibold mb-2 flex items-center">
+            🔍 Most Searched:
+            <span class="ml-2 flex flex-wrap gap-2">
+                @forelse ($mostSearched as $s)
+                    <a href="{{ url()->current() }}?search={{ urlencode($s->query) }}"
+                       class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded transition">
+                        {{ $s->query }} <span class="text-gray-500">({{ $s->total }})</span>
+                    </a>
+                @empty
+                    <span class="text-gray-500 text-sm">Belum ada data pencarian</span>
+                @endforelse
+            </span>
+        </h4>
+    </div>
 
     <div class="overflow-x-auto">
         <table class="min-w-full border">
